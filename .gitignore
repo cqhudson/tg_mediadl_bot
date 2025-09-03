@@ -1,0 +1,2 @@
+# .env contains API keys & should not be stored in svc
+.env
