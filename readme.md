@@ -1,5 +1,7 @@
 # Telegram Media Downloader Bot - [@tg_mediadl_bot](https://t.me/tg_mediadl_bot) 
 
+A Telegram bot written in Go. This project was made for the purpose of learning the Go programming language by developing a tool I could use daily. 
+
 Sending a video link to this bot will initiate a download, then the bot will send you the video in telegram. 
 
 ## dependencies
