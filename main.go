@@ -5,8 +5,9 @@ import (
 	"log"
 	"os" // needed to load env variables loaded from godotenv
 	"os/exec"
-	"strings"
+	//"strings"
 
+	"github.com/dlclark/regexp2" // more feature-rich regex package based on the .NET regex engine
 	"github.com/joho/godotenv"
 	"github.com/mymmrac/telego"
 )
@@ -53,59 +54,48 @@ func main() {
 
 		// Let's try and download a YouTube video depending on the input
 		isValidYTVideo := validateUrlIsYouTube(message)
-		log.Printf("Is the message sent a valid YouTube URL? --> %b", isValidYTVideo)
+		log.Printf("Is the message sent a valid YouTube URL? --> %s", isValidYTVideo)
 		if isValidYTVideo == true {
-			downloadYouTubeVideo(message)
+			//downloadYouTubeVideo(message)
+			log.Print("this is a valid youtube video link")
 		}
 	}
 
 }
 
-func validateUrlIsYouTube(url string) bool {
+func validateUrlIsYouTube(message string) bool {
+	// These are both the same video, we must be able to search both
+	// Example valid URL: https://youtu.be/pOcg-AdC2Y8?si=RC5W58mNkSLO2omb
+	// Example valid URL: https://www.youtube.com/watch?v=pOcg-AdC2Y8
+    // TODO -> Also need to validate if the link is missing the "http://" or "https://" substr.
 
-	// Example valid URL: https://youtu.be/nvUTNX0FDPA
+	// HERE IS AN EXAMPLE REGEX PATTERN
+	/*
+     *    \b(?:https?://(?:(?:www\\.)?youtube\\.com/watch\\?v=|youtu\\.be/)[A-Za-z0-9_-]{11}(?:\\?si=[A-Za-z0-9_-]+)?)(?=\\s|$)
+     *    The above regex is compiled below to:
+     *    (?:https?://(?:(?:www\.)?youtube\.com/watch\?v=|youtu\.be/)[A-Za-z0-9_-]{11}(?:\?si=[A-Za-z0-9_-]+)?)(?=\s|$) 
+	 *
+	 * Matches the first YouTube video URL (e.g., https://youtube.com/watch?v=VIDEO_ID or https://youtu.be/VIDEO_ID,
+	 *    with optional www. and http://, and optional ?si= query for youtu.be)
+	 *    with an 11-character video ID (letters, digits, hyphens, underscores),
+	 *    stopping at a space, newline, or end of string.
+	 */
+    
+    log.Printf("The message we are validating is --> %s", message)
 
-	// (TODO) Example flow for this function:
-	// 1 - Check if first few chars are "https://" or "http://"
-	// 2 - Check if the following substr is either "youtu.be" or "youtube.com"
-	// 3 - Check if there is a space or newline at the end of the URL (We only want the URl, and nothing else)
-	// 4 - Check if the link is a valid URL
+   	regexPatternUnparsed := "(?:https?://(?:(?:www\\.)?youtube\\.com/watch\\?v=|youtu\\.be/)[A-Za-z0-9_-]{11}(?:\\?si=[A-Za-z0-9_-]+)?)(?=\\s|$)"
 
-	// 1 - Check if url contains http or https
-	beginning := ""
-	containsHTTP := false
-	for _, letter := range url {
-		beginning += string(letter)
-		if beginning == "http://" || beginning == "https://" {
-			containsHTTP = true
-			break
-		}
-	}
-	if containsHTTP == false {
-		log.Printf("%s does not start with \"http://\" or \"http://\"")
+	// regexp2.MustCompile parses a regex and returns, if successful, a pointer to a Regexp object to match against text
+	regex := regexp2.MustCompile(regexPatternUnparsed, 0)
+	log.Printf("The compiled regex is --> %s", regex.String())
+
+	matchFound, err := regex.MatchString(message)
+	if err != nil {
+		log.Printf("There was an error trying to find a match --> %s", err.Error())
 		return false
 	}
 
-
-    // 2 - (TODO) rework this to check if next characters are a valid YouTube domain
-    // instead of blindly checking for the existence of the domain.
-	isValid := false
-	validYouTubeDomains := []string{
-		"youtu.be",
-		"youtube.com",
-	}
-
-	log.Printf("Checking if message is a valid YouTube URL. Message --> %s", url)
-
-	for _, domain := range validYouTubeDomains {
-		log.Printf("domain: %s", domain)
-		if (strings.Contains(url, domain)) == true {
-			isValid = true
-			break
-		}
-	}
-
-	return isValid
+	return matchFound
 }
 
 func downloadYouTubeVideo(url string) error {

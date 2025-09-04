@@ -3,6 +3,7 @@ module tgMediaDlBot
 go 1.24.6
 
 require (
+	github.com/dlclark/regexp2 v1.11.5
 	github.com/joho/godotenv v1.5.1
 	github.com/mymmrac/telego v1.3.0
 )
