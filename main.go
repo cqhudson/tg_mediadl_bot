@@ -44,10 +44,16 @@ func main() {
 
         const ytRegex string = "(?:https?://(?:(?:www\\.)?youtube\\.com/watch\\?v=|youtu\\.be/)[A-Za-z0-9_-]{11}(?:\\?si=[A-Za-z0-9_-]+)?)(?=\\s|$)" 
         containsYouTubeLink := checkForYouTubeLinks(message, ytRegex)  
-        if containsYouTubeLink == true {
+        if containsYouTubeLink {
             log.Print("The message contained a valid YouTube link. Attempting to download the YouTube video.")
+            url, err := extractUrl(message, ytRegex)
+            if err != nil {
+                log.Printf("There was an issue extracting the YouTube URL --> %s", err.Error())
+                continue
+            }
+            log.Printf("The extracted *Match object returned the following --> %+v", url)
 	    	//downloadYouTubeVideo(message)
-            break 
+            continue 
         } 
 
 	}
