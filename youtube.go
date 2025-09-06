@@ -48,15 +48,19 @@ func extractYouTubeId(url *regexp2.Match) string, error {
 
     if domain == "youtu.be" {
         // index+1 = the "/" char after the domain
-        // TODO FIX THIS FOR LOOP TO USE PROPER INDEXING!!!
-        for i := index+1, letter := range fullUrl {
-            if string(letter) == "?" || string(letter) == "\n" {
+        for i := index+1; i < len(fullUrl); i++ {
+            if string(fullUrl[i]) == "?" || string(fullUrl[i]) == "\n" {
                 return youtubeId, nil
             }
-            youtubeId += string(letter)
+        }
+           youtubeId += string(letter)
         }
     }
 
-    if domain == "youtube.com" {
-    }
+    return "", errors.New("Unable to extract a YouTube ID")
+
+    // TODO - Need to come up with a solution for live videos and shorts. This will likely break otherwise
+    //if domain == "youtube.com" {
+
+    //}
 }
