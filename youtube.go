@@ -50,6 +50,7 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 
 
     youtubeId := ""
+    log.Printf("the domain is %s", domain)
 
      
     log.Printf("Attempting to extract YT ID from domain %s", domain)
@@ -68,6 +69,7 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
     if domain == "https://youtube.com" || domain == "http://youtube.com" {
         temp := ""
         for i := index+2; i < len(fullUrl); i++ {
+            log.Printf("temp var == %s", temp)
             if temp == "watch" {
                 // this will skip the "?v=" chars 
                 for j := i+3; j< len(fullUrl); j++ {
@@ -82,7 +84,7 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
             // if temp := "live" {}
             // implement later to support Shorts downloads 
             // if temp := "short" {}
-            log.Printf("parsing youtu.be link --> %s", string(fullUrl[i]))
+            log.Printf("parsing youtu.be link --> %s", temp) 
 
             temp += string(fullUrl[i])
         }
