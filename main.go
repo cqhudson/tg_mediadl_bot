@@ -42,30 +42,30 @@ func main() {
 
 		message := update.Message.Text
 
-        const ytRegex string = "(?:https?://(?:(?:www\\.)?youtube\\.com/watch\\?v=|youtu\\.be/)[A-Za-z0-9_-]{11}(?:\\?si=[A-Za-z0-9_-]+)?)(?=\\s|$)" 
-        containsYouTubeLink := checkForYouTubeLinks(message, ytRegex)  
-        if containsYouTubeLink {
-            log.Print("The message contained a valid YouTube link. Attempting to download the YouTube video.")
-            url, err := extractUrl(message, ytRegex)
-            if err != nil {
-                log.Printf("There was an issue extracting the YouTube URL --> %s", err.Error())
-                continue
-            }
-            log.Printf("The extracted *Match object returned the following --> %+v", url)
+		const ytRegex string = "(?:https?://(?:(?:www\\.)?youtube\\.com/watch\\?v=|youtu\\.be/)[A-Za-z0-9_-]{11}(?:\\?si=[A-Za-z0-9_-]+)?)(?=\\s|$)"
+		containsYouTubeLink := checkForYouTubeLinks(message, ytRegex)
+		if containsYouTubeLink {
+			log.Print("The message contained a valid YouTube link. Attempting to download the YouTube video.")
+			url, err := extractUrl(message, ytRegex)
+			if err != nil {
+				log.Printf("There was an issue extracting the YouTube URL --> %s", err.Error())
+				continue
+			}
+			log.Printf("The extracted *Match object returned the following --> %+v", url)
 
-            youtubeId, err := extractYouTubeId(url)
-            if err != nil {
-                log.Printf("There was an error trying to extract a YouTube ID from the given URL: %s", err.Error())
-                continue
-            }
-            log.Printf("The extracted YouTube ID was --> %s", youtubeId)
-	    	//downloadYouTubeVideo(message)
-            continue 
-        } 
+			youtubeId, err := extractYouTubeId(url)
+			if err != nil {
+				log.Printf("There was an error trying to extract a YouTube ID from the given URL: %s", err.Error())
+				continue
+			}
+			log.Printf("The extracted YouTube ID was --> %s", youtubeId)
+			//downloadYouTubeVideo(message)
+			continue
+		}
 
 	}
 }
 
 func checkForYouTubeLinks(message string, regex string) bool {
-    return validateMessageContainsUrl(message, regex)
+	return validateMessageContainsUrl(message, regex)
 }
