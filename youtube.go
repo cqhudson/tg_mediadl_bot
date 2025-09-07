@@ -29,7 +29,7 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 
     log.Printf("Attempting to extract youtube ID from the following URL --> %s", url.Group.Capture.String())
 
-    // url.Group.Name returns a string.
+    // url.Group.Capture.String() returns a string.
     fullUrl := url.Group.Capture.String()
     domain := "" 
     index := 0
