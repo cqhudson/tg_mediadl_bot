@@ -33,23 +33,31 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 	fullUrl := url.Group.Capture.String()
 	domain := ""
 	index := 0
+    validDomains := map[string]bool {
+        "https://youtu.be": true,
+        "http://youtu.be": true,
+        "https://youtube.com": true,
+        "http://youtube.com": true,
+        "https://www.youtube.com": true,
+        "http://www.youtube.com": true,
+    }
 
 	// First let's grab the domain in the URL
 	for i, letter := range fullUrl {
 		log.Printf("parsing youtu.be domain --> %s", string(letter))
 		domain += string(letter)
-		if domain == "https://youtu.be" || domain == "http://youtu.be" || domain == "https://youtube.com" || domain == "http://youtube.com" {
+        if validDomains[domain] == true {
 			index = i
 			break
 		}
 	}
-	if domain != "https://youtu.be" && domain != "http://youtu.be" && domain != "https://youtube.com" && domain != "http://youtube.com" {
+    log.Printf("The domain parsed was %s", domain)
+	if validDomains[domain] == false {
 		// Something really bad happened if you hit this block :(
 		return "", errors.New("(extractYouTubeId func) - no valid YouTube domain could be extracted")
 	}
 
 	youtubeId := ""
-	log.Printf("the domain is %s", domain)
 
     if (domain == "https://youtu.be" || domain == "http://youtu.be") {
 		// index+1 = the "/" char after the domain
@@ -63,7 +71,7 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 		return youtubeId, nil
 	}
 
-    if domain == "https://youtube.com" || domain == "http://youtube.com" {
+    if domain == "https://youtube.com" || domain == "http://youtube.com" || domain == "https://www.youtube.com" || domain == "http://www.youtube.com" {
 		temp := ""
 		for i := index + 2; i < len(fullUrl); i++ {
 			log.Printf("temp var == %s", temp)
@@ -75,15 +83,13 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 					}
 					youtubeId += string(fullUrl[j])
 				}
+                return youtubeId, nil
 
 			}
 			// implement later to support Live downloads
 			// if temp := "live" {}
 			// implement later to support Shorts downloads
 			// if temp := "short" {}
-			log.Printf("parsing youtube.com link --> %s", temp)
-
-			temp += string(fullUrl[i])
 		}
 	}
 
