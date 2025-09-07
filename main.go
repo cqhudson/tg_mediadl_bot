@@ -52,6 +52,13 @@ func main() {
                 continue
             }
             log.Printf("The extracted *Match object returned the following --> %+v", url)
+
+            youtubeId, err := extractYouTubeId(url)
+            if err != nil {
+                log.Printf("There was an error trying to extract a YouTube ID from the given URL: %s", err.Error())
+                continue
+            }
+            log.Printf("The extracted YouTube ID was --> %s", youtubeId)
 	    	//downloadYouTubeVideo(message)
             continue 
         } 
