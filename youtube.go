@@ -25,42 +25,68 @@ func downloadYouTubeVideo(url string) error {
 	return nil
 }
 
-func extractYouTubeId(url *regexp2.Match) string, error { 
-    fullUrl := string(url)
+func extractYouTubeId(url *regexp2.Match) (string, error) { 
+
+    log.Printf("Attempting to extract youtube ID from the following URL --> %s", url.Group.Capture.String())
+
+    // url.Group.Name returns a string.
+    fullUrl := url.Group.Capture.String()
     domain := "" 
     index := 0
 
     // First let's grab the domain in the URL 
     for i, letter := range fullUrl {
+        log.Printf("parsing youtu.be domain --> %s", string(letter))
         domain += string(letter)
-        if domain == "youtu.be" || domain == "youtube.com" {
+        if domain == "https://youtu.be" || domain == "http://youtu.be" || domain == "https://youtube.com" || domain == "http://youtube.com" {
             index = i
-            break  
+            break 
         }
     }
-    if domain != "youtu.be" || domain != "youtube.com" {
+    if domain != "https://youtu.be" && domain != "http://youtu.be" && domain != "https://youtube.com" && domain != "http://youtube.com" {
         // Something really bad happened if you hit this block :(
-        return "", errors.New("(extractYouTubeId func) - no valid YouTube domain could be extracted" 
+        return "", errors.New("(extractYouTubeId func) - no valid YouTube domain could be extracted") 
     }
 
 
     youtubeId := ""
 
-    if domain == "youtu.be" {
+     
+    log.Printf("Attempting to extract YT ID from domain %s", domain)
+    if domain == "https://youtu.be" || domain == "http://youtu.be" {
         // index+1 = the "/" char after the domain
-        for i := index+1; i < len(fullUrl); i++ {
-            if string(fullUrl[i]) == "?" || string(fullUrl[i]) == "\n" {
+        for i := index+2; i < len(fullUrl); i++ {
+            if string(fullUrl[i]) == "?" || string(fullUrl[i]) == "\n"  || string(fullUrl[i]) == " " {
                 return youtubeId, nil
             }
+            log.Printf("parsing youtu.be link --> %s", string(fullUrl[i]))
+            youtubeId += string(fullUrl[i])
         }
-           youtubeId += string(letter)
+        return youtubeId, nil
+    }
+    
+    if domain == "https://youtube.com" || domain == "http://youtube.com" {
+        temp := ""
+        for i := index+2; i < len(fullUrl); i++ {
+            if temp == "watch" {
+                // this will skip the "?v=" chars 
+                for j := i+3; j< len(fullUrl); j++ {
+                    if string(fullUrl[j]) == "&" || string(fullUrl[j]) == "\n" || string(fullUrl[j]) == " " {
+                        return youtubeId, nil
+                    }
+                    youtubeId += string(fullUrl[j]) 
+                }
+
+            }
+            // implement later to support Live downloads
+            // if temp := "live" {}
+            // implement later to support Shorts downloads 
+            // if temp := "short" {}
+            log.Printf("parsing youtu.be link --> %s", string(fullUrl[i]))
+
+            temp += string(fullUrl[i])
         }
     }
 
     return "", errors.New("Unable to extract a YouTube ID")
-
-    // TODO - Need to come up with a solution for live videos and shorts. This will likely break otherwise
-    //if domain == "youtube.com" {
-
-    //}
 }
