@@ -59,7 +59,14 @@ func main() {
 				continue
 			}
 			log.Printf("The extracted YouTube ID was --> %s", youtubeId)
-			//downloadYouTubeVideo(message)
+
+            log.Printf("Attempting to download YouTube video")
+			err = downloadYouTubeVideo(message, youtubeId)
+            if err != nil {
+                log.Printf("There was an error trying to download the video: %s", err.Error())
+                continue
+            }
+
 			continue
 		}
 

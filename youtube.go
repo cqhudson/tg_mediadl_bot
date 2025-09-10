@@ -2,26 +2,51 @@ package main
 
 import (
 	"errors"
+    "fmt"
 	"log"
 	"os/exec"
+    "path/filepath"
 
 	"github.com/dlclark/regexp2"
 )
 
-func downloadYouTubeVideo(url string) error {
+func downloadYouTubeVideo(url string, youtubeId string) error {
+
+    // Resolve absolute path to yt-dlp executable
+    absYtDlpPath, err := filepath.Abs("./exec/yt-dlp.exe")
+    if err != nil {
+        log.Printf("Failed to resolve yt-dlp path %s", err.Error())
+        return err
+    }   
+    log.Printf("The following path was resolved --> %s", absYtDlpPath)  
+
+    // Resolve absolute path to downloads directory 
+    downloadPath := filepath.Join(".", "downloads", "YT")
+    absDownloadPath, err := filepath.Abs(downloadPath)
+    if err != nil {
+        log.Printf("Failed to resolve download path %s", err.Error())
+        return err
+    }  
+    log.Printf("The following path was resolved --> %s", absDownloadPath)
+
+       
 
 	// Command line options for yt-dlp
-	// Example command: .\executables\yt-dlp.exe -o ".\downloads\YT\%(autonumber)06d.%(ext)s" https://youtu.be/n8-wN0lc5qk?si=cD1KaaffXHWjn0jq
-	// Example: save video as ".\downloads\YT\000004.webm"
-	outputOption := "-o \".\\downloads\\YT\\%(autonumber)06d.%(ext)s\""
+	outputOption := fmt.Sprintf("-o %s\\%s.%%(ext)s\"", absDownloadPath, youtubeId)
+    compressionOptions := fmt.Sprintf("-f \"bestvideo[height<=480]+bestaudio/best\"")
+    log.Printf("output options --> %s", outputOption)
+    log.Printf("compression options --> %s", compressionOptions)
 
-	cmd := exec.Command("exec/yt-dlp.exe", outputOption, url)
-	err := cmd.Run()
+    opts := fmt.Sprintf("%s %s", outputOption, compressionOptions)
+
+	cmd := exec.Command(absYtDlpPath, opts, url)
+    stdoutStderr, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Printf("Unable to execute command: %s", err.Error())
+		log.Printf("Unable to execute command: %+v", err)
 	}
+    log.Printf("%s/n", stdoutStderr)
 
-	log.Printf("The command run was --> %s", cmd)
+	log.Printf("The command run was --> %s", cmd.String())
 	return nil
 }
 
