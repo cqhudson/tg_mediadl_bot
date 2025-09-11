@@ -2,7 +2,7 @@
 .env
 
 # downloads folder is where all video downloads are saved to disk. No need to track
-downloads
+download
 
 # executables folder is where yt-dlp is stored, and potentially others. Not sure if need to track yet.
 exec
