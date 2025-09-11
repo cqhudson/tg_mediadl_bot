@@ -4,16 +4,24 @@ import (
 	"errors"
     "fmt"
 	"log"
+    "os"
 	"os/exec"
     "path/filepath"
+    "syscall"
 
 	"github.com/dlclark/regexp2"
 )
 
 func downloadYouTubeVideo(url string, youtubeId string) error {
 
+    binary, err := exec.LookPath("exec/yt-dlp")
+    if err != nil { 
+        log.Printf("Failed to LookPath --> %s", err.Error())
+    }
+    log.Printf("Binary found --> %+v", binary)
+       
     // Resolve absolute path to yt-dlp executable
-    absYtDlpPath, err := filepath.Abs("./exec/yt-dlp.exe")
+    absYtDlpPath, err := filepath.Abs("exec/yt-dlp")
     if err != nil {
         log.Printf("Failed to resolve yt-dlp path %s", err.Error())
         return err
@@ -21,33 +29,34 @@ func downloadYouTubeVideo(url string, youtubeId string) error {
     log.Printf("The following path was resolved --> %s", absYtDlpPath)  
 
     // Resolve absolute path to downloads directory 
-    downloadPath := filepath.Join(".", "downloads", "YT")
-    absDownloadPath, err := filepath.Abs(downloadPath)
+    absDownloadPath, err := filepath.Abs("youtube/yt")
     if err != nil {
         log.Printf("Failed to resolve download path %s", err.Error())
         return err
     }  
     log.Printf("The following path was resolved --> %s", absDownloadPath)
-
        
 
 	// Command line options for yt-dlp
-	outputOption := fmt.Sprintf("-o %s\\%s.%%(ext)s", absDownloadPath, youtubeId)
-    compressionOptions := fmt.Sprintf("-S \"res:480\"")
+	outputOption := fmt.Sprintf("download/yt/%s.%%(ext)s", youtubeId)
+    compressionOptions := fmt.Sprintf("-S res:480")
     log.Printf("output options --> %s", outputOption)
     log.Printf("compression options --> %s", compressionOptions)
 
-    args := fmt.Sprintf("%s %s", outputOption, compressionOptions)
-    log.Printf("The args for this command is %s", args)
+    args := []string{
+        binary,
+        "-o",
+        outputOption, 
+        compressionOptions,
+        url,
+    }
 
-	cmd := exec.Command(absYtDlpPath, args, url)
-    stdoutStderr, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Printf("Unable to execute command: %+v", err)
-	}
-    log.Printf("%s/n", stdoutStderr)
+    env := os.Environ()  
 
-	log.Printf("The command run was --> %s", cmd.String())
+    err = syscall.Exec(binary, args, env) 
+    if err != nil { 
+        log.Printf("Error executing command --> %s", err.Error()) 
+    }
 	return nil
 }
 
