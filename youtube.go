@@ -32,14 +32,15 @@ func downloadYouTubeVideo(url string, youtubeId string) error {
        
 
 	// Command line options for yt-dlp
-	outputOption := fmt.Sprintf("-o %s\\%s.%%(ext)s\"", absDownloadPath, youtubeId)
-    compressionOptions := fmt.Sprintf("-f \"bestvideo[height<=480]+bestaudio/best\"")
+	outputOption := fmt.Sprintf("-o %s\\%s.%%(ext)s", absDownloadPath, youtubeId)
+    compressionOptions := fmt.Sprintf("-S \"res:480\"")
     log.Printf("output options --> %s", outputOption)
     log.Printf("compression options --> %s", compressionOptions)
 
-    opts := fmt.Sprintf("%s %s", outputOption, compressionOptions)
+    args := fmt.Sprintf("%s %s", outputOption, compressionOptions)
+    log.Printf("The args for this command is %s", args)
 
-	cmd := exec.Command(absYtDlpPath, opts, url)
+	cmd := exec.Command(absYtDlpPath, args, url)
     stdoutStderr, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Printf("Unable to execute command: %+v", err)
@@ -69,7 +70,7 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 
 	// First let's grab the domain in the URL
 	for i, letter := range fullUrl {
-		log.Printf("parsing youtu.be domain --> %s", string(letter))
+		// log.Printf("parsing youtu.be domain --> %s", string(letter))
 		domain += string(letter)
         if validDomains[domain] == true {
 			index = i
@@ -90,7 +91,7 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 			if string(fullUrl[i]) == "?" || string(fullUrl[i]) == "\n" || string(fullUrl[i]) == " " {
 				return youtubeId, nil
 			}
-			log.Printf("parsing youtu.be link --> %s", string(fullUrl[i]))
+		    // 	log.Printf("parsing youtu.be link --> %s", string(fullUrl[i]))
 			youtubeId += string(fullUrl[i])
 		}
 		return youtubeId, nil
