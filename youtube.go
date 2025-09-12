@@ -52,6 +52,7 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 		log.Printf("Failed to open downloaded file %s: %s", filePath, err.Error())
 		return nil, err
 	}
+    log.Printf("file is %+v", file)
 
 	return file, nil
 }
