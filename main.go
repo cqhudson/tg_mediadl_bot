@@ -7,6 +7,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/mymmrac/telego"
+    tu "github.com/mymmrac/telegoutil"
 )
 
 func main() {
@@ -61,11 +62,25 @@ func main() {
 			log.Printf("The extracted YouTube ID was --> %s", youtubeId)
 
             log.Printf("Attempting to download YouTube video")
-			err = downloadYouTubeVideo(message, youtubeId)
+			downloadedVideo, err = downloadYouTubeVideo(message, youtubeId)
             if err != nil {
                 log.Printf("There was an error trying to download the video: %s", err.Error())
                 continue
             }
+
+            // let's send the downloaded video to the user now
+            // func (b *Bot) SendVideo(ctx context.Context, params *SendVideoParams) (*Message, error)
+            sendVideoParams := telego.SendVideoParams {
+                ChatID: tu.ID(update.Message.Chat.Id),
+                Video: telego.InputFile { 
+                    File: downloadedVideo,
+                },
+            }   
+            sentMsg, err := bot.SendVideo(contect.Background(), *sendVideoParams)
+            if err != nil {
+                log.Printf("An error occurred while sending the video --> %s", err)
+                continue
+            }   
 
 			continue
 		}

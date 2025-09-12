@@ -12,30 +12,13 @@ import (
 	"github.com/dlclark/regexp2"
 )
 
-func downloadYouTubeVideo(url string, youtubeId string) error {
+func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 
     binary, err := exec.LookPath("exec/yt-dlp")
     if err != nil { 
         log.Printf("Failed to LookPath --> %s", err.Error())
     }
     log.Printf("Binary found --> %+v", binary)
-       
-    // Resolve absolute path to yt-dlp executable
-    absYtDlpPath, err := filepath.Abs("exec/yt-dlp")
-    if err != nil {
-        log.Printf("Failed to resolve yt-dlp path %s", err.Error())
-        return err
-    }   
-    log.Printf("The following path was resolved --> %s", absYtDlpPath)  
-
-    // Resolve absolute path to downloads directory 
-    absDownloadPath, err := filepath.Abs("youtube/yt")
-    if err != nil {
-        log.Printf("Failed to resolve download path %s", err.Error())
-        return err
-    }  
-    log.Printf("The following path was resolved --> %s", absDownloadPath)
-       
 
 	// Command line options for yt-dlp
 	outputOption := fmt.Sprintf("download/yt/%s.%%(ext)s", youtubeId)
@@ -48,6 +31,10 @@ func downloadYouTubeVideo(url string, youtubeId string) error {
         "-o",
         outputOption, 
         compressionOptions,
+        "-f",
+        "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+        "--recode-video",
+        "mp4",
         url,
     }
 
@@ -56,8 +43,17 @@ func downloadYouTubeVideo(url string, youtubeId string) error {
     err = syscall.Exec(binary, args, env) 
     if err != nil { 
         log.Printf("Error executing command --> %s", err.Error()) 
+        return nil, err
     }
-	return nil
+
+    filePath := filepath.Join("download/yt" + youtubeId+".mp4")
+    file, err := os.Open(filePath)
+    if err != nil {
+        log.Printf("Failed to open downloaded file %s: %s", filePath, err.Error()) 
+        return nil, err
+    }
+    
+	return file, nil
 }
 
 func extractYouTubeId(url *regexp2.Match) (string, error) {
