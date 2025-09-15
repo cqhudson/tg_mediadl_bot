@@ -62,7 +62,7 @@ func main() {
 			log.Printf("The extracted YouTube ID was --> %s", youtubeId)
 
 			log.Printf("Attempting to download YouTube video")
-            downloadedVideo, err := downloadYouTubeVideo(message, youtubeId)
+			downloadedVideo, err := downloadYouTubeVideo(message, youtubeId)
 			if err != nil {
 				log.Printf("There was an error trying to download the video: %s", err.Error())
 				continue
@@ -81,7 +81,7 @@ func main() {
 				log.Printf("An error occurred while sending the video --> %s", err)
 				continue
 			}
-            log.Printf("Sent Msg object contains the following --> %+v", sentMsg)   
+			log.Printf("Sent Msg object contains the following --> %+v", sentMsg)
 
 			continue
 		}
