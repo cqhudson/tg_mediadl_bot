@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"syscall"
 
 	"github.com/dlclark/regexp2"
 )
@@ -33,19 +32,24 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 		compressionOptions,
 		"-f",
 		"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
-		"--recode-video",
-		"mp4",
+		//"--recode-video",
+		//"mp4",
 		url,
 	}
 
-	env := os.Environ()
 
-	err = syscall.Exec(binary, args, env)
+	log.Print("attempting to download video")
+	
+	cmd := exec.Command(binary, args...)
+	stdoutStderr, err := cmd.CombinedOutput() 
+	log.Printf("the output from running the command: %s", stdoutStderr)
 	if err != nil {
-		log.Printf("Error executing command --> %s", err.Error())
+		log.Printf("there was an error running the command --> %s", err.Error())
 		return nil, err
 	}
 
+
+	log.Print("attempting to fetch a handle to the downloaded file")
 	filePath := filepath.Join("download/yt" + youtubeId + ".mp4")
 	file, err := os.Open(filePath)
 	if err != nil {
