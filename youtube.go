@@ -13,14 +13,14 @@ import (
 )
 
 func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
-	
+
 	// First let's check for an existing video
 	//
 	existingDownload, err := checkVideoAlreadyDownloaded("download/yt", youtubeId)
 	if err != nil {
 		log.Printf("There was an error trying to check for existing download --> %s", err.Error())
 	}
-	
+
 	// If an existing download was found, let's return a pointer to it instead of redownloading
 	//
 	if existingDownload != "" {
@@ -32,7 +32,7 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 		} else {
 			log.Printf("Got a pointer to the file --> %+v", file)
 			return file, nil
-		}	
+		}
 
 	}
 
@@ -134,7 +134,7 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 	}
 
 	// TODO: This is broken, need to fix support for youtube.com domain parsing
-	if domain == "https://youtube.com" || domain == "http://youtube.com" ||	domain == "https://www.youtube.com" || domain == "http://www.youtube.com" ||	domain == "https://m.youtube.com" || domain == "http://m.youtube.com" {
+	if domain == "https://youtube.com" || domain == "http://youtube.com" || domain == "https://www.youtube.com" || domain == "http://www.youtube.com" || domain == "https://m.youtube.com" || domain == "http://m.youtube.com" {
 
 		temp := ""
 		for i := index + 2; i < len(fullUrl); i++ {
@@ -163,10 +163,10 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 
 // if the video is already downloaded, then we can send the existing video
 func checkVideoAlreadyDownloaded(dir string, filename string) (string, error) {
-    var filePath string	
+	var filePath string
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return err 
+			return err
 		}
 		if info.IsDir() == false {
 			// Get filename without extension since we don't necessarily know
@@ -177,13 +177,13 @@ func checkVideoAlreadyDownloaded(dir string, filename string) (string, error) {
 				return filepath.SkipDir
 			}
 		}
-		return nil 
+		return nil
 	})
 	if err != nil {
 		return "", err
 	}
 	if filePath == "" {
 		return "", fmt.Errorf("Failed to find existing file with base name of %s", filename)
-	} 
+	}
 	return filePath, nil
 }

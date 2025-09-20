@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"log"
 	"fmt"
+	"log"
 	"os" // needed to load env variables loaded from godotenv
 
 	"github.com/joho/godotenv"
@@ -79,8 +79,8 @@ func main() {
 			// let's send the downloaded video to the user now
 			// func (b *Bot) SendVideo(ctx context.Context, params *SendVideoParams) (*Message, error)
 			sentMsg, err := bot.SendVideo(context.Background(), &telego.SendVideoParams{
-					ChatID: tu.ID(update.Message.Chat.ID),
-					Video: telego.InputFile{
+				ChatID: tu.ID(update.Message.Chat.ID),
+				Video: telego.InputFile{
 					File: downloadedVideo,
 				},
 			})
@@ -103,14 +103,14 @@ func checkForYouTubeLinks(message string, regex string, shouldLog bool) bool {
 // Utility func for easily sending plain Telegram messages
 func sendTelegramMessage(bot *telego.Bot, update *telego.Update, msg string, shouldLog bool) error {
 	if shouldLog == true {
-		username :=	update.Message.From.Username
+		username := update.Message.From.Username
 		id := update.Message.From.ID
 		log.Printf("Attempting to send the following message to user %s with ID %d --> %s", username, id, msg)
 	}
-		
-	send, err := bot.SendMessage(context.Background(), &telego.SendMessageParams {
-		ChatID: tu.ID(update.Message.Chat.ID),
-		Text: msg,
+
+	send, err := bot.SendMessage(context.Background(), &telego.SendMessageParams{
+		ChatID:         tu.ID(update.Message.Chat.ID),
+		Text:           msg,
 		ProtectContent: true,
 	})
 	if err != nil {
