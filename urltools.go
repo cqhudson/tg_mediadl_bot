@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/dlclark/regexp2"
@@ -35,9 +36,10 @@ func validateMessageContainsUrl(message string, regex string, shouldLog bool) bo
 }
 
 func extractUrl(message string, regex string, shouldLog bool) (*regexp2.Match, error) {
+	const loggingHeader string = "[extractUrl]"
 	if shouldLog == true {
-		log.Printf("[extractUrl] -- attempting to extract URL from the following message --> %s", message)
-		log.Printf("[extractUrl] -- matching against the following regex --> %s", regex)
+		log.Printf("%s -- attempting to extract URL from the following message --> %s", loggingHeader, message)
+		log.Printf("%s -- matching against the following regex --> %s", loggingHeader, regex)
 	}
 
 	regexFormatted := regexp2.MustCompile(regex, 0)
@@ -46,12 +48,12 @@ func extractUrl(message string, regex string, shouldLog bool) (*regexp2.Match, e
 	if err != nil {
 		return nil, err
 	} else if match == nil {
-		errorMsg := "[extractUrl] - match was empty or no match was able to be extracted."
+		errorMsg := fmt.Sprintf("%s -- match was empty or no match was able to be extracted.", loggingHeader)
 		return nil, errors.New(errorMsg)
 	}
 
 	if shouldLog == true {
-		log.Printf("[extractUrl] -- matched the following URL --> %+v", match)
+		log.Printf("%s -- matched the following URL --> %+v", loggingHeader, match)
 	}
 	return match, nil
 } 
