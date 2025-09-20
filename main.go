@@ -49,7 +49,7 @@ func main() {
 		containsYouTubeLink := checkForYouTubeLinks(message, ytRegex)
 		if containsYouTubeLink {
 			log.Print("The message contained a valid YouTube link. Attempting to download the YouTube video.")
-			url, err := extractUrl(message, ytRegex)
+			url, err := extractUrl(message, ytRegex, true)
 			if err != nil {
 				log.Printf("There was an issue extracting the YouTube URL --> %s", err.Error())
 				continue
