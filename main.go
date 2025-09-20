@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os" // needed to load env variables loaded from godotenv
+	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/mymmrac/telego"
@@ -12,40 +12,77 @@ import (
 )
 
 func main() {
+	
+	// Pass in true to enable debugging logs, false for production
+	//
+	logger := NewLogger(true)
 
-	// First load the .env file
-	log.Print("Loading .env file")
+	const header string = "[main]"
+	logger.Printf("%s -- logging is enabled", header)
+	//
+	////
+
+	//// First load the .env file
+	//
+	logger.Printf("%s -- Loading .env file", header)
+
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Error loading .env file: %s", err.Error())
+		log.Fatalf("%s -- Error loading .env file: %s", header, err.Error())
 	}
-	log.Print(".env file successfully loaded")
+		
+	logger.Printf("%s -- .env file successfully loaded", header)
+	//
+	////
 
-	// Attempt to fetch Telegram API token after .env is loaded
+	//// Attempt to fetch Telegram API token after .env is loaded
+	//
+	logger.Printf("%s -- Attempting to fetch Telegram API token from environment", header)
+
 	telegramToken, telegramTokenExists := os.LookupEnv("TG_API_KEY")
 	if telegramTokenExists == false {
-		log.Fatal("Error fetching TG_API_KEY environment variable")
+		log.Fatal("%s -- Error fetching TG_API_KEY environment variable", header)
 	}
-	log.Printf("Your Telegram API token is %s", telegramToken) // This line is for local debugging and should be disabled when running in prod
 
-	// Create the Telegram bot and enable debugging info
-	// (debugging info should only be used during local development)
+	logger.Printf("%s -- Your Telegram API token is %s", header, telegramToken) 
+	//
+	////
+
+	//// Create the Telegram bot
+	// 
+	logger.Printf("%s -- Attempting to create a bot instance with Telegram", header)
+
 	bot, err := telego.NewBot(telegramToken, telego.WithDefaultDebugLogger())
 	if err != nil {
-		log.Fatalf("Failed to initialize bot: %s", err.Error())
+		log.Fatalf("%s -- Failed to initialize bot: %s", header, err.Error())
 	}
 
-	// Get updates from Telegram
+	logger.Printf("%s -- Successfully created bot instance: ID %d - Username %s", header, bot.ID(), bot.Username())
+	//
+	////
+
+	//// Get updates from Telegram
+	//
+	logger.Printf("%s -- Fetching updates from Telegram via long polling", header)
+
 	updates, _ := bot.UpdatesViaLongPolling(context.Background(), nil)
+	//
+	////
 
-	// Loop through all updates that come in
+	//// Loop through all updates that come in
+	//
 	for update := range updates {
-		log.Printf("Update:  %+v \n", update)
 
+		logger.Printf("Update:  %+v", update)
+
+		// Message.Text contains the exact text the user sent the bot
+		//
 		message := update.Message.Text
 
 		// This regex is DISGUSTING and makes me sad
+		//
 		const ytRegex string = `https?://(?:www\.|m\.)?youtube\.com/watch\?v=[A-Za-z0-9_-]{11}(?:\?si=[A-Za-z0-9_-]+)?|https?://youtu\.be/[A-Za-z0-9_-]{11}(?:\?si=[A-Za-z0-9_-]+)?`
+
 		containsYouTubeLink := checkForYouTubeLinks(message, ytRegex, true)
 		if containsYouTubeLink {
 			log.Print("The message contained a valid YouTube link. Attempting to download the YouTube video.")
@@ -94,6 +131,8 @@ func main() {
 		}
 
 	}
+	//
+	////
 }
 
 func checkForYouTubeLinks(message string, regex string, shouldLog bool) bool {
