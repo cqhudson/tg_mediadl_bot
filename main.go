@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"fmt"
 	"os" // needed to load env variables loaded from godotenv
 
 	"github.com/joho/godotenv"
@@ -61,6 +62,7 @@ func main() {
 			}
 			log.Printf("The extracted YouTube ID was --> %s", youtubeId)
 
+			// If the video is already downloaded, we will just send that file
 			log.Printf("Attempting to download YouTube video")
 			downloadedVideo, err := downloadYouTubeVideo(message, youtubeId)
 			if err != nil {
@@ -68,15 +70,19 @@ func main() {
 				continue
 			}
 
+			// Let's send a message letting the user know that the video is being sent
+			//
+			message := fmt.Sprintf("Attempting to download %s, please be patient as larger videos may take some time to send", url)
+			err = sendTelegramMessage(bot, &update, message, true)
+
 			// let's send the downloaded video to the user now
 			// func (b *Bot) SendVideo(ctx context.Context, params *SendVideoParams) (*Message, error)
-			sendVideoParams := telego.SendVideoParams{
-				ChatID: tu.ID(update.Message.Chat.ID),
-				Video: telego.InputFile{
+			sentMsg, err := bot.SendVideo(context.Background(), &telego.SendVideoParams{
+					ChatID: tu.ID(update.Message.Chat.ID),
+					Video: telego.InputFile{
 					File: downloadedVideo,
 				},
-			}
-			sentMsg, err := bot.SendVideo(context.Background(), &sendVideoParams)
+			})
 			if err != nil {
 				log.Printf("An error occurred while sending the video --> %s", err)
 				continue
@@ -91,4 +97,27 @@ func main() {
 
 func checkForYouTubeLinks(message string, regex string) bool {
 	return validateMessageContainsUrl(message, regex)
+}
+
+// Utility func for easily sending plain Telegram messages
+func sendTelegramMessage(bot *telego.Bot, update *telego.Update, msg string, shouldLog bool) error {
+	if shouldLog == true {
+		username :=	update.Message.From.Username
+		id := update.Message.From.ID
+		log.Printf("Attempting to send the following message to user %s with ID %d --> %s", username, id, msg)
+	}
+		
+	send, err := bot.SendMessage(context.Background(), &telego.SendMessageParams {
+		ChatID: tu.ID(update.Message.Chat.ID),
+		Text: msg,
+		ProtectContent: true,
+	})
+	if err != nil {
+		return fmt.Errorf("There was an issue sending a message: %s", err.Error())
+	}
+
+	if shouldLog == true {
+		log.Printf("Message was sent successfully --> %+v", send)
+	}
+	return nil
 }
