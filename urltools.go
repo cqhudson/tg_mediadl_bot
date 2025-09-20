@@ -8,7 +8,7 @@ import (
 )
 
 func validateMessageContainsUrl(message string, regex string, shouldLog bool) bool {
-	const var loggingHeader string = "[validateMessageContainsUrl]"
+	const loggingHeader string = "[validateMessageContainsUrl]"
 	if shouldLog == true {
 		log.Printf("%s -- Attempting to validate the following message contains a URL --> %s", loggingHeader, message)
 	}	
