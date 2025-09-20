@@ -1,10 +1,10 @@
 package main
 
 import (
-    "log"
-    "errors"
+	"errors"
+	"log"
 
-    "github.com/dlclark/regexp2"
+	"github.com/dlclark/regexp2"
 )
 
 func validateMessageContainsUrl(message string, regex string) bool {
@@ -21,16 +21,16 @@ func validateMessageContainsUrl(message string, regex string) bool {
 	return matchFound
 }
 
-func extractUrl(message string, regex string) (*regexp2.Match, error) { 
-    regexFormatted := regexp2.MustCompile(regex, 0)
-    
-    match, err := regexFormatted.FindStringMatch(message)
-    if err != nil {
-        return nil, err 
-    } else if match == nil {
-        errorMsg := "(extractUrl func) - match was empty or no match was able to be extracted."
-        return nil, errors.New(errorMsg)
-    }
+func extractUrl(message string, regex string) (*regexp2.Match, error) {
+	regexFormatted := regexp2.MustCompile(regex, 0)
 
-    return match, nil
+	match, err := regexFormatted.FindStringMatch(message)
+	if err != nil {
+		return nil, err
+	} else if match == nil {
+		errorMsg := "(extractUrl func) - match was empty or no match was able to be extracted."
+		return nil, errors.New(errorMsg)
+	}
+
+	return match, nil
 }
