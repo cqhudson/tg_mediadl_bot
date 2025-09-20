@@ -44,7 +44,8 @@ func main() {
 
 		message := update.Message.Text
 
-		const ytRegex string = "(?:https?://(?:(?:www\\.)?youtube\\.com/watch\\?v=|youtu\\.be/)[A-Za-z0-9_-]{11}(?:\\?si=[A-Za-z0-9_-]+)?)(?=\\s|$)"
+		// This regex is DISGUSTING and makes me sad
+		const ytRegex string = `https?://(?:www\.|m\.)?youtube\.com/watch\?v=[A-Za-z0-9_-]{11}(?:\?si=[A-Za-z0-9_-]+)?|https?://youtu\.be/[A-Za-z0-9_-]{11}(?:\?si=[A-Za-z0-9_-]+)?`
 		containsYouTubeLink := checkForYouTubeLinks(message, ytRegex)
 		if containsYouTubeLink {
 			log.Print("The message contained a valid YouTube link. Attempting to download the YouTube video.")
