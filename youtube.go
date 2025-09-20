@@ -100,6 +100,8 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 		"http://youtube.com":      true,
 		"https://www.youtube.com": true,
 		"http://www.youtube.com":  true,
+		"https://m.youtube.com":   true,
+		"http://m.youtube.com":    true,
 	}
 
 	// First let's grab the domain in the URL
@@ -132,7 +134,8 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 	}
 
 	// TODO: This is broken, need to fix support for youtube.com domain parsing
-	if domain == "https://youtube.com" || domain == "http://youtube.com" || domain == "https://www.youtube.com" || domain == "http://www.youtube.com" {
+	if domain == "https://youtube.com" || domain == "http://youtube.com" ||	domain == "https://www.youtube.com" || domain == "http://www.youtube.com" ||	domain == "https://m.youtube.com" || domain == "http://m.youtube.com" {
+
 		temp := ""
 		for i := index + 2; i < len(fullUrl); i++ {
 			log.Printf("temp var == %s", temp)
@@ -147,6 +150,7 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 				return youtubeId, nil
 
 			}
+			temp += string(fullUrl[i])
 			// implement later to support Live downloads
 			// if temp := "live" {}
 			// implement later to support Shorts downloads
