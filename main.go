@@ -46,7 +46,7 @@ func main() {
 
 		// This regex is DISGUSTING and makes me sad
 		const ytRegex string = `https?://(?:www\.|m\.)?youtube\.com/watch\?v=[A-Za-z0-9_-]{11}(?:\?si=[A-Za-z0-9_-]+)?|https?://youtu\.be/[A-Za-z0-9_-]{11}(?:\?si=[A-Za-z0-9_-]+)?`
-		containsYouTubeLink := checkForYouTubeLinks(message, ytRegex)
+		containsYouTubeLink := checkForYouTubeLinks(message, ytRegex, true)
 		if containsYouTubeLink {
 			log.Print("The message contained a valid YouTube link. Attempting to download the YouTube video.")
 			url, err := extractUrl(message, ytRegex, true)
@@ -96,8 +96,8 @@ func main() {
 	}
 }
 
-func checkForYouTubeLinks(message string, regex string) bool {
-	return validateMessageContainsUrl(message, regex)
+func checkForYouTubeLinks(message string, regex string, shouldLog bool) bool {
+	return validateMessageContainsUrl(message, regex, shouldLog)
 }
 
 // Utility func for easily sending plain Telegram messages

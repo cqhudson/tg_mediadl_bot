@@ -7,17 +7,30 @@ import (
 	"github.com/dlclark/regexp2"
 )
 
-func validateMessageContainsUrl(message string, regex string) bool {
-	log.Printf("The message we are validating is --> %s", message)
-	regexFormatted := regexp2.MustCompile(regex, 0)
-	log.Printf("The compiled regex is --> %s", regexFormatted)
+func validateMessageContainsUrl(message string, regex string, shouldLog bool) bool {
+	const var loggingHeader string = "[validateMessageContainsUrl]"
+	if shouldLog == true {
+		log.Printf("%s -- Attempting to validate the following message contains a URL --> %s", loggingHeader, message)
+	}	
+
+	regexFormatted, err := regexp2.Compile(regex, 0)
+	if err != nil {
+		log.Printf("%s -- ERROR compiling regex --> %s", loggingHeader, err.Error())
+		return false
+	}	
+	if shouldLog == true {
+		log.Printf("%s -- Compiled regex --> %s", loggingHeader, regexFormatted.String())
+	}
 
 	matchFound, err := regexFormatted.MatchString(message)
 	if err != nil {
-		log.Printf("(MatchString) There was an error trying to find a match --> %s", err.Error())
+		log.Printf("%s -- There was an error trying to find a match --> %s", loggingHeader, err.Error())
 		return false
 	}
 
+	if shouldLog == true {
+		log.Printf("%s -- Matched the message \"%s\" against the compiled regex \"%s\"", loggingHeader, message)
+	}	
 	return matchFound
 }
 
