@@ -155,13 +155,23 @@ func main() {
 			if err != nil {
 				l.Printf("Failed to send message to %s --> %s", username, err.Error())
 			} else {
-				l.Printf("Seccessfully sent %s the following Telegram message --> %s", username, msg)
+				l.Printf("Successfully sent %s the following Telegram message --> %s", username, msg)
 			}
 
 			downloadedVideo, err := downloadYouTubeVideo(message, youtubeId)
 
 			if err != nil {
 				l.Printf("There was an error trying to download the video: %s", err.Error())
+
+				msg := "Failed to download video. I appologize for the inconvenience. Please wait a little bit and try again later."
+				err = sendTelegramMessage(bot, &update, msg)
+				 
+				if err != nil {
+					l.Printf("Failed to send message to %s --> %s", username, err.Error())
+				} else { 
+					l.Printf("Successfully sent %s the following Telegram message --> %s", username, msg)
+				}
+
 				continue
 			}
 
