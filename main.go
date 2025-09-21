@@ -54,7 +54,7 @@ func main() {
 	// 
 	l.Print("Attempting to create a bot instance with Telegram")
 
-	bot, err := telego.NewBot(telegramToken, telego.WithDefaultDebugLogger())
+	bot, err := telego.NewBot(telegramToken, telego.WithDiscardLogger())
 	if err != nil {
 		l.Fatalf("Failed to initialize bot: %s", err.Error())
 	}
