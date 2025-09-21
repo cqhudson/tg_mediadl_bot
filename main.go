@@ -9,13 +9,14 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/mymmrac/telego"
 	tu "github.com/mymmrac/telego/telegoutil"
+	"github.com/cqhudson/logger"
 )
 
 func main() {
 	
 	// Pass in true to enable debugging logs, false for production
 	//
-	logger := NewLogger(true)
+	logger := logger.NewLogger(true, true, true)
 
 	const header string = "[main]"
 	logger.Printf("%s -- logging is enabled", header)

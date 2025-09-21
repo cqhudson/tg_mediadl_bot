@@ -1,8 +1,9 @@
 module tgMediaDlBot
 
-go 1.24.6
+go 1.25.1
 
 require (
+	github.com/cqhudson/logger v0.0.0-20250921031621-2a5ac5620f83
 	github.com/dlclark/regexp2 v1.11.5
 	github.com/joho/godotenv v1.5.1
 	github.com/mymmrac/telego v1.3.0
