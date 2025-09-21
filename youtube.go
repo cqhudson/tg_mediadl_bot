@@ -10,27 +10,38 @@ import (
 	"strings"
 
 	"github.com/dlclark/regexp2"
+	"github.com/cqhudson/logger"
 )
 
 func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 
+	// Instantiate new logger
+	//
+	l := logger.NewLogger(true, false, false)
+	//
+
 	// First let's check for an existing video
 	//
+	l.Printf("Checking for an existing YouTube video download for %s", youtubeId)
+
 	existingDownload, err := checkVideoAlreadyDownloaded("download/yt", youtubeId)
+
 	if err != nil {
-		log.Printf("There was an error trying to check for existing download --> %s", err.Error())
+		l.Printf("There was an error trying to check for existing download --> %s", err.Error())
+	} else {
+		l.Print("Successfully checked for existing download")
 	}
 
 	// If an existing download was found, let's return a pointer to it instead of redownloading
 	//
 	if existingDownload != "" {
-		log.Printf("Existing file found at --> %s", existingDownload)
+		l.Printf("Existing file found at --> %s", existingDownload)
 
 		file, err := os.Open(existingDownload)
 		if err != nil {
-			log.Printf("There was an error trying to fetch a pointer to the file --> %s", err.Error())
+			l.Printf("There was an error trying to fetch a pointer to the file --> %s", err.Error())
 		} else {
-			log.Printf("Got a pointer to the file --> %+v", file)
+			l.Printf("Got a pointer to the file --> %+v", file)
 			return file, nil
 		}
 
@@ -40,9 +51,9 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 	//
 	binary, err := exec.LookPath("exec/yt-dlp")
 	if err != nil {
-		log.Printf("Failed to LookPath --> %s", err.Error())
+		l.Printf("Failed to LookPath --> %s", err.Error())
 	}
-	log.Printf("Binary found --> %+v", binary)
+	l.Printf("Binary found --> %+v", binary)
 
 	// Command line options for yt-dlp
 	outputOption := fmt.Sprintf("download/yt/%s.%%(ext)s", youtubeId)
@@ -58,8 +69,6 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 		"-f",
 		// **should** force a download in mp4 format
 		"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
-		//"--recode-video",
-		//"mp4",
 		url,
 	}
 
@@ -67,27 +76,21 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 
 	cmd := exec.Command(binary, args...)
 	stdoutStderr, _ := cmd.CombinedOutput()
-	log.Printf("the output from running the command: %s", stdoutStderr)
-	/*if err != nil {
-		log.Printf("there was an error running the command --> %s", err.Error())
-		return nil, err
-	}*/
+	l.Printf("the output from running the command: %s", stdoutStderr)
 
-	log.Print("attempting to fetch a handle to the downloaded file")
+	l.Print("attempting to fetch a handle to the downloaded file")
 	filePath := filepath.Join("download/yt/" + youtubeId + ".mp4")
 	file, err := os.Open(filePath)
 	if err != nil {
-		log.Printf("Failed to open downloaded file %s: %s", filePath, err.Error())
+		l.Printf("Failed to open downloaded file %s: %s", filePath, err.Error())
 		return nil, err
 	}
-	log.Printf("file is %+v", file)
+	l.Printf("file is %+v", file)
 
 	return file, nil
 }
 
 func extractYouTubeId(url *regexp2.Match) (string, error) {
-
-	log.Printf("Attempting to extract youtube ID from the following URL --> %s", url.Group.Capture.String())
 
 	// url.Group.Capture.String() returns a string.
 	fullUrl := url.Group.Capture.String()
@@ -106,7 +109,6 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 
 	// First let's grab the domain in the URL
 	for i, letter := range fullUrl {
-		// log.Printf("parsing youtu.be domain --> %s", string(letter))
 		domain += string(letter)
 		if validDomains[domain] == true {
 			index = i
@@ -127,13 +129,11 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 			if string(fullUrl[i]) == "?" || string(fullUrl[i]) == "\n" || string(fullUrl[i]) == " " {
 				return youtubeId, nil
 			}
-			// 	log.Printf("parsing youtu.be link --> %s", string(fullUrl[i]))
 			youtubeId += string(fullUrl[i])
 		}
 		return youtubeId, nil
 	}
 
-	// TODO: This is broken, need to fix support for youtube.com domain parsing
 	if domain == "https://youtube.com" || domain == "http://youtube.com" || domain == "https://www.youtube.com" || domain == "http://www.youtube.com" || domain == "https://m.youtube.com" || domain == "http://m.youtube.com" {
 
 		temp := ""
