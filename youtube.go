@@ -71,20 +71,38 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 		url,
 	}
 
-	log.Print("attempting to download video")
+	// Attempt to download the video
+	//
+	l.Print("Attempting to download video")
 
 	cmd := exec.Command(binary, args...)
-	stdoutStderr, _ := cmd.CombinedOutput()
+	l.Printf("Running the following command --> %+v", cmd)
+ 
+	stdoutStderr, err := cmd.CombinedOutput()
+
+	if err != nil {
+		l.Printf("There was an error attempting to download the video --> %s", err.Error())
+		l.Printf("Output from stdout/stderr --> %s", stdoutStderr)
+		return nil, err
+	}
+
 	l.Printf("the output from running the command: %s", stdoutStderr)
 
+	// Fetch a handle to the downloaded
+	//
 	l.Print("attempting to fetch a handle to the downloaded file")
+
 	filePath := filepath.Join("download/yt/" + youtubeId + ".mp4")
 	file, err := os.Open(filePath)
+
 	if err != nil {
 		l.Printf("Failed to open downloaded file %s: %s", filePath, err.Error())
 		return nil, err
 	}
-	l.Printf("file is %+v", file)
+
+	fileInfo, _ := file.Stat()
+
+	l.Printf("filename found is %s and the filesize is %d bytes", fileInfo.Name(), fileInfo.Size())
 
 	return file, nil
 }
