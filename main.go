@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -96,7 +95,7 @@ func main() {
 
 		if containsYouTubeLink {
 
-			// If the message contains a valid link, attempt to extract it from the message
+			// If the message contains a youtube link, attempt to extract it from the message
 			//
 			l.Print("The message contained a valid YouTube link. Attempting to extract it from the message.")
 
@@ -104,7 +103,16 @@ func main() {
 
 			if err != nil {
 				l.Printf("There was an issue extracting the YouTube URL --> %s", err.Error())
-				// TODO: Send a Telegram message back to the user stating that the URL is invalid
+
+				msg := "There was an issue extracting the youtube link from your message. Please ensure your URL is valid"
+				err = sendTelegramMessage(bot, &update, msg)
+
+				if err != nil {
+					l.Printf("Failed to send message to %s --> %s", username, err.Error())
+				} else {
+					l.Printf("Successfully send %s the following Telegram message --> %s", username, msg)
+				}
+
 				continue
 			}
 
@@ -120,7 +128,16 @@ func main() {
 
 			if err != nil {
 				l.Printf("There was an error trying to extract a YouTube ID from the given URL: %s", err.Error())
-				// TODO: Send a Telegram message back to the user stating that the URL is invalid
+				
+				msg := "There was an issue extracting the youtube ID from the link you sent. Please ensure your URL is valid."
+				err = sendTelegramMessage(bot, &update, msg)
+
+				if err != nil {
+					l.Printf("Failed to send message to %s --> %s", username, err.Error())
+				} else {
+					l.Printf("Successfully sent %s the following Telegram message --> %s", username, msg)
+				}
+
 				continue
 			}
 
@@ -132,7 +149,14 @@ func main() {
 			//
 			l.Printf("Attempting to download YouTube video")
 
-			// TODO: Send a Telegram message to the user stating that we are attempting to dl the video
+			msg := "Attempting to download YouTube video. Please be patient as it can take a few minutes to finish the download."
+			err = sendTelegramMessage(bot, &update, msg)
+
+			if err != nil {
+				l.Printf("Failed to send message to %s --> %s", username, err.Error())
+			} else {
+				l.Printf("Seccessfully sent %s the following Telegram message --> %s", username, msg)
+			}
 
 			downloadedVideo, err := downloadYouTubeVideo(message, youtubeId)
 
@@ -149,12 +173,12 @@ func main() {
 			//
 			l.Printf("Attempting to send a message to %s to let them know we are attempting to send them a file", username)
 
-			message := fmt.Sprintf("Attempting to send %s, please be patient as larger videos may take some time to send", url)
-			err = sendTelegramMessage(bot, &update, message, true)
+			msg = "Successfully downloaded the video. Attempting to send it to you. Please be patient as larger videos may take some time to send"
+			err = sendTelegramMessage(bot, &update, msg)
 
 			// TODO: Add error handling here
 
-			l.Printf("Successfully sent the following message to %s --> %+v", username, message)
+			l.Printf("Successfully sent the following message to %s --> %+v", username, msg)
 
 			//
 			////

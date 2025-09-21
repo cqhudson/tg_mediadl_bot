@@ -10,7 +10,7 @@ import (
 )
 
 // Utility func for easily sending plain Telegram messages
-func sendTelegramMessage(bot *telego.Bot, update *telego.Update, msg string, shouldLog bool) error {
+func sendTelegramMessage(bot *telego.Bot, update *telego.Update, msg string) error {
 
 	l := logger.NewLogger(true, false, false)
 
@@ -35,5 +35,5 @@ func sendTelegramMessage(bot *telego.Bot, update *telego.Update, msg string, sho
 	//
 	////
 
-		return nil
+	return nil
 }
