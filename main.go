@@ -14,9 +14,9 @@ import (
 
 func main() {
 	
-	// Pass in true to enable debugging logs, false for production
+	// NewLogger(enablePrints, enablePanics, enableFatals)
 	//
-	logger := logger.NewLogger(true, true, true)
+	logger := logger.NewLogger(true, false, true)
 
 	const header string = "[main]"
 	logger.Printf("%s -- logging is enabled", header)
