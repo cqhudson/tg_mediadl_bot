@@ -62,7 +62,6 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 	log.Printf("compression options --> %s", compressionOptions)
 
 	args := []string{
-		binary,
 		"-o",
 		outputOption,
 		compressionOptions,
