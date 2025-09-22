@@ -56,18 +56,37 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 	l.Printf("Binary found --> %+v", binary)
 
 	// Command line options for yt-dlp
-	outputOption := fmt.Sprintf("download/yt/%s.%%(ext)s", youtubeId)
-	compressionOptions := fmt.Sprintf("-S res:480")
-	log.Printf("output options --> %s", outputOption)
-	log.Printf("compression options --> %s", compressionOptions)
+	outputFlag    := "-o"
+	outputOptions := fmt.Sprintf("download/yt/%s.%%(ext)s", youtubeId)
+
+	compressionFlag    := "-f"
+	compressionOptions := fmt.Sprint("bestvideo[ext=mp4][height<=720]+bestaudio[ext=m4a][abr<=128]/best[ext=mp4][height<=720]")
+
+	filesizeFlag    := "--max-filesize"
+	filesizeOptions := "49.9M"
+
+	filetypeFlag    := "--remux-video"
+	filetypeOptions := "mp4"
+	
+
+	l.Printf("output options --> %s", outputOptions)
+	l.Printf("compression options --> %s", compressionOptions)
+	l.Printf("filesize options --> %s", filesizeOptions)
+	l.Printf("filetype options --> %s", filetypeOptions)
 
 	args := []string{
-		"-o",
-		outputOption,
+		outputFlag,		
+		outputOptions,
+
+		compressionFlag,
 		compressionOptions,
-		"-f",
-		// **should** force a download in mp4 format
-		"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+
+		filesizeFlag,
+		filesizeOptions,
+
+		filetypeFlag,
+		filetypeOptions,
+
 		url,
 	}
 
@@ -82,11 +101,12 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 
 	if err != nil {
 		l.Printf("There was an error attempting to download the video --> %s", err.Error())
-		l.Printf("Output from stdout/stderr --> %s", stdoutStderr)
+		l.Printf("Output from stdout/stderr -->\n%s", stdoutStderr)
+		// TODO: Add logic here to determine if failure was caused by filesize.
 		return nil, err
 	}
 
-	l.Printf("the output from running the command: %s", stdoutStderr)
+	l.Printf("the output from running the command:\n%s", stdoutStderr)
 
 	// Fetch a handle to the downloaded
 	//
