@@ -6,7 +6,6 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/mymmrac/telego"
-	tu "github.com/mymmrac/telego/telegoutil"
 	"github.com/cqhudson/logger"
 )
 
@@ -197,20 +196,15 @@ func main() {
 			// func (b *Bot) SendVideo(ctx context.Context, params *SendVideoParams) (*Message, error)
 			//
 			l.Printf("Attempting to send video file to %s", username)
-
-			sentMsg, err := bot.SendVideo(context.Background(), &telego.SendVideoParams{
-				ChatID: tu.ID(update.Message.Chat.ID),
-				Video: telego.InputFile{
-					File: downloadedVideo,
-				},
-			})
+			
+			err = SendTelegramVideo(bot, &update, downloadedVideo)	
 
 			if err != nil {
 				l.Printf("An error occurred while sending the video --> %s", err)
 				continue
 			}
 
-			l.Printf("Successfully sent the following message to %s --> %+v", username, sentMsg)
+			l.Printf("Successfully sent the video to %s", username)
 			//
 			////
 
