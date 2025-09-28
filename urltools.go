@@ -30,7 +30,7 @@ func validateMessageContainsUrl(message string, regex string, shouldLog bool) bo
 	}
 
 	if shouldLog == true {
-		log.Printf("%s -- Matched the message \"%s\" against the compiled regex \"%s\"", loggingHeader, message)
+		log.Printf("%s -- Matched the message \"%s\" against the compiled regex \"%s\"", loggingHeader, message, regex)
 	}
 	return matchFound
 }

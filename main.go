@@ -31,7 +31,7 @@ func main() {
 	if err != nil {
 		l.Fatalf("Error loading .env file: %s", err.Error())
 	}
-		
+
 	l.Print(".env file successfully loaded")
 	//
 	////
@@ -45,7 +45,7 @@ func main() {
 		l.Fatal("Error fetching TG_API_KEY environment variable")
 	}
 
-	l.Print("Your Telegram API token is %s", telegramToken) 
+	l.Printf("Your Telegram API token is %s", telegramToken) 
 	//
 	////
 
@@ -78,8 +78,6 @@ func main() {
 
 		// This regex is DISGUSTING and makes me sad
 		//
-		// const ytRegex string = `https?://(?:www\.|m\.)?youtube\.com/watch\?v=[A-Za-z0-9_-]{11}(?:\?si=[A-Za-z0-9_-]+)?|https?://youtu\.be/[A-Za-z0-9_-]{11}(?:\?si=[A-Za-z0-9_-]+)?`
-		// Testing for YouTube Shorts support 
 		const ytRegex string = `https?://(?:www\.|m\.)?youtube\.com/(?:watch\?v=|shorts/)[A-Za-z0-9_-]{11}(?:\?si=[A-Za-z0-9_-]+)?|https?://youtu\.be/[A-Za-z0-9_-]{11}(?:\?si=[A-Za-z0-9_-]+)?`
 		l.Printf("Checking for YouTube video using the following regex --> %s", ytRegex)
 
