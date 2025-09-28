@@ -338,7 +338,11 @@ func handleYouTubeVideo(update *telego.Update, ytRegex string, bot *telego.Bot) 
 	msg = "Successfully downloaded the video. Attempting to send it to you. Please be patient as larger videos may take some time to send"
 	err = sendTelegramMessage(bot, update, msg)
 
-	// TODO: Add error handling here
+	if err != nil {
+		l.Printf("Failed to send message to %s --> %s", username, err.Error())
+	} else { 
+		l.Printf("Successfully sent %s the following Telegram message --> %s", username, msg)
+	}
 
 	l.Printf("Successfully sent the following message to %s --> %+v", username, msg)
 
