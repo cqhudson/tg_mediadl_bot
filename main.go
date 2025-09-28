@@ -74,6 +74,14 @@ func main() {
 	//
 	for update := range updates {
 
+		// TODO: implement an optional whitelist so the bot only responds to approved users
+		/*
+		something like this...
+			if USING_WHITELIST && USER_ID IS NOT IN WHITELIST {
+				continue
+			}
+		*/
+
 		l.Printf("Update:  %+v", update)
 
 		// This regex is DISGUSTING and makes me sad
