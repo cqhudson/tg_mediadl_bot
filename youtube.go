@@ -180,7 +180,8 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 			log.Printf("temp var == %s", temp)
 			if temp == "watch" {
 				// this will skip the "?v=" chars
-				for j := i + 3; j < len(fullUrl); j++ {
+				offset := 3
+				for j := i + offset; j < len(fullUrl); j++ {
 					if string(fullUrl[j]) == "&" || string(fullUrl[j]) == "\n" || string(fullUrl[j]) == " " {
 						return youtubeId, nil
 					}
@@ -189,11 +190,25 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 				return youtubeId, nil
 
 			}
-			temp += string(fullUrl[i])
-			// implement later to support Live downloads
-			// if temp := "live" {}
+
 			// implement later to support Shorts downloads
 			// if temp := "short" {}
+			if temp == "shorts" {
+				// this will skip the initial "/" after shorts in the url
+				offset := 1
+				for j := i + offset; j < len(fullUrl); j++ {
+					if string(fullUrl[j]) == "?" || string(fullUrl[j]) == "\n" || string(fullUrl[j]) == " " {
+						return youtubeId, nil
+					}
+					youtubeId += string(fullUrl[j])
+				}
+				return youtubeId, nil
+			}
+
+			temp += string(fullUrl[i])
+
+			// implement later to support Live downloads
+			// if temp := "live" {}
 		}
 	}
 
