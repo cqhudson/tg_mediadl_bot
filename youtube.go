@@ -206,9 +206,6 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 			}
 
 			temp += string(fullUrl[i])
-
-			// implement later to support Live downloads
-			// if temp := "live" {}
 		}
 	}
 
