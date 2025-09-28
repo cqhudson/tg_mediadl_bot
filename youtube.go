@@ -257,7 +257,7 @@ func handleYouTubeVideo(update *telego.Update, ytRegex string, bot *telego.Bot) 
 	//
 	l.Print("The message contained a valid YouTube link. Attempting to extract it from the message.")
 
-	url, err := extractUrl(message, ytRegex, true)
+	url, err := extractUrl(message, ytRegex)
 
 	if err != nil {
 		l.Printf("There was an issue extracting the YouTube URL --> %s", err.Error())

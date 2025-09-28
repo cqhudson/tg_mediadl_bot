@@ -81,7 +81,7 @@ func main() {
 		const ytRegex string = `https?://(?:www\.|m\.)?youtube\.com/(?:watch\?v=|shorts/)[A-Za-z0-9_-]{11}(?:\?si=[A-Za-z0-9_-]+)?|https?://youtu\.be/[A-Za-z0-9_-]{11}(?:\?si=[A-Za-z0-9_-]+)?`
 		l.Printf("Checking for YouTube video using the following regex --> %s", ytRegex)
 
-		containsYouTubeLink := checkForYouTubeLinks(update.Message.Text, ytRegex, true)
+		containsYouTubeLink := checkForYouTubeLinks(update.Message.Text, ytRegex)
 
 		if containsYouTubeLink {
 			handleYouTubeVideo(&update, ytRegex, bot);
@@ -92,7 +92,7 @@ func main() {
 	////
 }
 
-func checkForYouTubeLinks(message string, regex string, shouldLog bool) bool {
-	return validateMessageContainsUrl(message, regex, shouldLog)
+func checkForYouTubeLinks(message string, regex string) bool {
+	return validateMessageContainsUrl(message, regex)
 }
 
