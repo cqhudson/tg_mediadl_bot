@@ -92,7 +92,18 @@ func main() {
 		containsYouTubeLink := checkForYouTubeLinks(update.Message.Text, ytRegex)
 
 		if containsYouTubeLink {
-			handleYouTubeVideo(&update, ytRegex, bot);
+			handleYouTubeVideo(&update, ytRegex, bot)
+		}
+
+		// This regex also disgusts me, just not as much. I need to determine a better way of checking link types
+		//
+		const xRegex string = `https?://(?:www\.)?(?:x|twitter)\.com/[a-zA-Z0-9_]+/status/\d+(?:/video/\d+)?(?:\?.*)?`
+		l.Printf("Checking for X/Twitter video using the following regex --> %s", xRegex)
+
+		containsXLink := checkForXLinks(update.Message.Text, xRegex)
+
+		if containsXLink {
+			handleXLinks(&update, xRegex, bot)
 		}
 
 	}
@@ -101,6 +112,10 @@ func main() {
 }
 
 func checkForYouTubeLinks(message string, regex string) bool {
+	return validateMessageContainsUrl(message, regex)
+}
+
+func checkForXLinks(message string, regex string) bool {
 	return validateMessageContainsUrl(message, regex)
 }
 
