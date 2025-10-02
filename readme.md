@@ -15,8 +15,13 @@ Sending a video link to this bot will initiate a download, then the bot will sen
 
 
 ## How are downloads managed?
-- YouTube `download\yt\video_id.mp4`
+- YouTube `download/yt/video_id.mp4`
  
 YouTube videos will be named after the video ID in the youtube url. For example, given the link `https://www.youtube.com/watch?v=n8-wN0lc5qk&list=RDn8-wN0lc5qk&start_radio=1`, the video id is the string of characters after `?v=`. So for this specific URL the video ID is `n8-wN0lc5qk` and the video will be saved as `n8-wN0lc5qk.mp4`. This will allow us to search for existing downloads, rather than redownloading the same video.
+
+- X / Twitter `download/x/video_id.mp4`
+
+X videos will be named after the 20 digit ID in the X URL. For example, given the link `https://x.com/theo/status/1973167911419412985`, the video ID is the string of characters after `status/`. So the video ID for this specific URL is `1973167911419412985` and the video will be saved as `1973167911419412985.mp4`.
+
 
 Each video should be deleted after a number of days to save on disk space. This might be implemented later.
