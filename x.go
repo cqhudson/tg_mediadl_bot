@@ -47,24 +47,27 @@ func extractXId(url *regexp2.Match) (string, error) {
 	}
 
 	xId := ""
+	temp := ""
 
 	if validDomains[domain] {
 		// If the parsing is specific per domain, rewrite this by referring to youtube.go
 		for i := index+1; i < len(fullUrl); i++ {
-			temp := string(fullUrl[i])
+			temp += string(fullUrl[i])
 
 			// This is getting the substring for the last 7 chars of the temp variable, searching for "status/"
-			if len(temp) > 5 && string(temp[len(temp)-6:len(temp)]) == "status/" {
+			if len(temp) > 5 && string(temp[len(temp)-7:len(temp)]) == "status/" {
 				for j := i++; j < len(fullUrl); j++ {
 					// next chars are the video ID
-					if string(fullUrl[i]) != "\n" || string(fullUrl[i]) != "/" || string(fullUrl[i]) != "" || string(fullUrl[i]) != " " {
-						xId += string(fullUrl[i])
+					if string(fullUrl[j]) != "\n" && string(fullUrl[j]) != "/" && string(fullUrl[j]) != "" && string(fullUrl[j]) != " " {
+						xId += string(fullUrl[j])
+					}
+					else {
+						return xId, nil	
 					}
 				}
-				return xId, nil
 			}
 		}	
 	}
 	return "", errors.New("Failed to parse out an X ID from the URL")
-
 }
+
