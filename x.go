@@ -26,10 +26,13 @@ func extractXId(url *regexp2.Match) (string, error) {
 	domain := ""
 	index := 0
 	validDomains := map[string]bool{
-		"https://x.com":	true,
-		"http://x.com":		true,
-		"https://twitter.com":	true,
-		"http://twitter.com":	true,
+		"https://x.com":		true,
+		"http://x.com":			true,
+		"https://www.x.com":		true,
+		"http://www.x.com":		true,
+		"https://twitter.com":		true,
+		"http://twitter.com":		true,
+		"https://www.twitter.com":	true,
 	}
 
 	// First let's grab the domain in the URL
