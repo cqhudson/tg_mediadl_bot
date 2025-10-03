@@ -103,7 +103,7 @@ func main() {
 		containsXLink := checkForXLinks(update.Message.Text, xRegex)
 
 		if containsXLink {
-			handleXLinks(&update, xRegex, bot)
+			handleXVideo(&update, xRegex, bot)
 		}
 
 	}

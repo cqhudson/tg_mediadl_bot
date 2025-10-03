@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"github.com/mymmrac/telego"
 	"github.com/dlclark/regexp2"
@@ -14,7 +13,6 @@ import (
 )
 
 func downloadVideoFromX(url string, xId string) (*os.File, error) {
-	// TODO: Implement support for downloading videos from Xitter
 
 	// Example links to download from:
 	// https://x.com/Solopopsss/status/1973363399234052232
@@ -62,7 +60,7 @@ func downloadVideoFromX(url string, xId string) (*os.File, error) {
 
 	// Command line options for yt-dlp
 	outputFlag 		:= "-o"
-	outputOptions 		:= fmt.Sprintf("download/x/%s.%%(ext)s")
+	outputOptions 		:= fmt.Sprintf("download/x/%s.%%(ext)s", xId)
 
 	compressionFlag		:= "-f"
 	compressionOptions 	:= fmt.Sprintf("bestvideo[ext=mp4][height<=720]+bestaudio[ext=m4a][abr<=128]/best[ext=mp4][height<=720]")
@@ -150,7 +148,7 @@ func extractXId(url *regexp2.Match) (string, error) {
 	}
 
 	// First let's grab the domain in the URL
-	for i, letter := range fullURL {
+	for i, letter := range fullUrl {
 		domain += string(letter)
 		if validDomains[domain] == true {
 			index = i
@@ -165,22 +163,24 @@ func extractXId(url *regexp2.Match) (string, error) {
 
 	xId := ""
 	temp := ""
-	substringLength = len("shorts/")
+	substringLength := len("shorts/")
 
 	if validDomains[domain] {
 		// If the parsing is specific per domain, rewrite this by referring to youtube.go
 		for i := index+1; i < len(fullUrl); i++ {
 			temp += string(fullUrl[i])
+			l.Printf("temp = %s", temp)
 			
 			// This is getting the substring for the last 7 chars of the temp variable, searching for "status/"
-			if len(temp) > 5 && string(temp[length:len(temp)]) == "status/" {
-				for j := i++; j < len(fullUrl); j++ {
-					// next chars are the video ID
-					if string(fullUrl[j]) != "\n" && string(fullUrl[j]) != "/" && string(fullUrl[j]) != "" && string(fullUrl[j]) != " " {
-						xId += string(fullUrl[j])
-					}
-					else {
-						return xId, nil	
+			if len(temp) > substringLength {
+				if string(temp[len(temp)-substringLength:len(temp)]) == "status/" {
+					for j := i+1; j < len(fullUrl); j++ {
+						// next chars are the video ID
+						if string(fullUrl[j]) != "\n" && string(fullUrl[j]) != "/" && string(fullUrl[j]) != "" && string(fullUrl[j]) != " " && string(fullUrl[j]) != "?" {
+							xId += string(fullUrl[j])
+						} else {
+							return xId, nil	
+						}
 					}
 				}
 			}
@@ -189,7 +189,7 @@ func extractXId(url *regexp2.Match) (string, error) {
 	return "", errors.New("Failed to parse out an X ID from the URL")
 }
 
-handleXVideo(update *telego.Update, xRegex string, bot *telego.Bot) {
+func handleXVideo(update *telego.Update, xRegex string, bot *telego.Bot) {
 	
 	l := logger.NewLogger(true, false, false)
 
@@ -229,7 +229,7 @@ handleXVideo(update *telego.Update, xRegex string, bot *telego.Bot) {
 	//
 	l.Print("Attempting to extract the ID from the X link.")
 
-	xId, err := extractYouTubeId(url)
+	xId, err := extractXId(url)
 
 	if err != nil {
 		l.Printf("There was an error trying to extract a X ID from the given URL: %s", err.Error())
@@ -261,7 +261,7 @@ handleXVideo(update *telego.Update, xRegex string, bot *telego.Bot) {
 		l.Printf("Successfully sent %s the following Telegram message --> %s", username, msg)
 	}
 
-	downloadedVideo, err := downloadXVideo(message, xId)
+	downloadedVideo, err := downloadVideoFromX(message, xId)
 
 	if err != nil {
 		l.Printf("There was an error trying to download the video: %s", err.Error())

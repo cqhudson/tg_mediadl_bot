@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"github.com/mymmrac/telego"
 	"github.com/dlclark/regexp2"
