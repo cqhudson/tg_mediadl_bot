@@ -14,14 +14,6 @@ import (
 
 func downloadVideoFromX(url string, xId string) (*os.File, error) {
 
-	// Example links to download from:
-	// https://x.com/Solopopsss/status/1973363399234052232
-	// https://x.com/theo/status/1973210960522559746
-	// https://x.com/theo/status/1973167911419412985
-	// https://x.com/theo/status/1973167911419412985/video/1
-
-	// Seems like /video/1 is a redirect to the post itself.
-
 	// Instantiate new Logger
 	//
 	l := logger.NewLogger(true, false, false)
@@ -113,8 +105,6 @@ func downloadVideoFromX(url string, xId string) (*os.File, error) {
 
 	// Fetch a handle to the downloaded
 	//
-	l.Print("attempting to fetch a handle to the downloaded file")
-
 	filePath := filepath.Join("download/x/" + xId + ".mp4")
 	file, err := os.Open(filePath)
 
@@ -122,10 +112,6 @@ func downloadVideoFromX(url string, xId string) (*os.File, error) {
 		l.Printf("Failed to open downloaded file %s: %s", filePath, err.Error())
 		return nil, err
 	}
-
-	fileInfo, _ := file.Stat()
-
-	l.Printf("filename found is %s and the filesize is %d bytes", fileInfo.Name(), fileInfo.Size())
 
 	return file, nil
 }
@@ -169,7 +155,6 @@ func extractXId(url *regexp2.Match) (string, error) {
 		// If the parsing is specific per domain, rewrite this by referring to youtube.go
 		for i := index+1; i < len(fullUrl); i++ {
 			temp += string(fullUrl[i])
-			l.Printf("temp = %s", temp)
 			
 			// This is getting the substring for the last 7 chars of the temp variable, searching for "status/"
 			if len(temp) > substringLength {
@@ -179,7 +164,7 @@ func extractXId(url *regexp2.Match) (string, error) {
 						if string(fullUrl[j]) != "\n" && string(fullUrl[j]) != "/" && string(fullUrl[j]) != "" && string(fullUrl[j]) != " " && string(fullUrl[j]) != "?" {
 							xId += string(fullUrl[j])
 						} else {
-							return xId, nil	
+							return xId, nil
 						}
 					}
 				}
@@ -205,111 +190,73 @@ func handleXVideo(update *telego.Update, xRegex string, bot *telego.Bot) {
 	// If the message contains a youtube link, attempt to extract it from the message
 	//
 	l.Print("The message contained a valid X link. Attempting to extract it from the message.")
-
 	url, err := extractUrl(message, xRegex)
-
 	if err != nil {
 		l.Printf("There was an issue extracting the X URL --> %s", err.Error())
-
 		msg := "There was an issue extracting the X/Twitter link from your message. Please ensure your URL is valid"
-		err = sendTelegramMessage(bot, update, msg)
-
-		if err != nil {
-			l.Printf("Failed to send message to %s --> %s", username, err.Error())
-		} else {
-			l.Printf("Successfully send %s the following Telegram message --> %s", username, msg)
-		}
+		_ = sendTelegramMessage(bot, update, msg)
 	}
-
 	l.Printf("The extraction returned the following --> %+v", url)
 	//
-	////
+	//
 
 	// If the URL is valid, we need to extract the YT ID from it
 	//
 	l.Print("Attempting to extract the ID from the X link.")
-
 	xId, err := extractXId(url)
-
 	if err != nil {
 		l.Printf("There was an error trying to extract a X ID from the given URL: %s", err.Error())
-		
+
 		msg := "There was an issue extracting the X/Twitter ID from the link you sent. Please ensure your URL is valid."
-		err = sendTelegramMessage(bot, update, msg)
-
-		if err != nil {
-			l.Printf("Failed to send message to %s --> %s", username, err.Error())
-		} else {
-			l.Printf("Successfully sent %s the following Telegram message --> %s", username, msg)
-		}
+		_ = sendTelegramMessage(bot, update, msg)
 	}
-
 	l.Printf("The extracted X ID was --> %s", xId)
 	//
-	////
+	//
 
 	// Attempt to download the video. If it is already downloaded, we will send the downloaded file. 
 	//
-	l.Printf("Attempting to download X video")
-
 	msg := "Attempting to download X video. Please be patient as it can take a few minutes to finish the download."
 	err = sendTelegramMessage(bot, update, msg)
-
 	if err != nil {
 		l.Printf("Failed to send message to %s --> %s", username, err.Error())
 	} else {
 		l.Printf("Successfully sent %s the following Telegram message --> %s", username, msg)
 	}
-
 	downloadedVideo, err := downloadVideoFromX(message, xId)
-
 	if err != nil {
 		l.Printf("There was an error trying to download the video: %s", err.Error())
 
 		msg := "Failed to download video. I appologize for the inconvenience. Please wait a little bit and try again later."
-		err = sendTelegramMessage(bot, update, msg)
-		 
-		if err != nil {
-			l.Printf("Failed to send message to %s --> %s", username, err.Error())
-		} else { 
-			l.Printf("Successfully sent %s the following Telegram message --> %s", username, msg)
-		}
+		_ = sendTelegramMessage(bot, update, msg)
 	}
-
 	l.Printf("The downloaded video was found --> %+v", downloadedVideo)
 	//
-	////
+	//
 
 	// Let's send a message letting the user know that the video is being sent
 	//
-	l.Printf("Attempting to send a message to %s to let them know we are attempting to send them a file", username)
-
 	msg = "Successfully downloaded the video. Attempting to send it to you. Please be patient as larger videos may take some time to send"
 	err = sendTelegramMessage(bot, update, msg)
-
 	if err != nil {
 		l.Printf("Failed to send message to %s --> %s", username, err.Error())
-	} else { 
-		l.Printf("Successfully sent %s the following Telegram message --> %s", username, msg)
+
+		msg := "Failed to send video due to a network error. I appologize for the inconvenience. Please try again later."
+		_ = sendTelegramMessage(bot, update, msg)
 	}
-
 	l.Printf("Successfully sent the following message to %s --> %+v", username, msg)
-
 	//
-	////
+	//
 
 	// let's send the downloaded video to the user now
 	// func (b *Bot) SendVideo(ctx context.Context, params *SendVideoParams) (*Message, error)
 	//
 	l.Printf("Attempting to send video file to %s", username)
-	
 	err = SendTelegramVideo(bot, update, downloadedVideo)	
-
 	if err != nil {
-		l.Printf("An error occurred while sending the video --> %s", err)
+		l.Printf("An error occurred while sending the video --> %s", err.Error())
 	}
-
 	l.Printf("Successfully sent the video to %s", username)
 	//
-	////
+	//
 }
