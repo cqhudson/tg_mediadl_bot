@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/dlclark/regexp2"
 	"github.com/cqhudson/logger"
@@ -51,6 +50,6 @@ func extractUrl(message string, regex string) (*regexp2.Match, error) {
 		return nil, errors.New(errorMsg)
 	}
 
-	log.Printf("%s -- matched the following URL --> %+v", loggingHeader, match)
+	l.Printf("%s -- matched the following URL --> %+v", loggingHeader, match)
 	return match, nil
 }
