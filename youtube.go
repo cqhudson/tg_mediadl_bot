@@ -18,7 +18,6 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 	// Instantiate new logger
 	//
 	l := logger.NewLogger(true, false, false)
-	//
 
 	// First let's check for an existing video
 	//
@@ -122,9 +121,21 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 
 	fileInfo, _ := file.Stat()
 
-	l.Printf("filename found is %s and the filesize is %d bytes", fileInfo.Name(), fileInfo.Size())
+	// If file is over 49.5MB, we shouldn't send it (Telegram Bot API Limitation)
+	//
+	if fileInfo.Size()
 
-	return file, nil
+	// Max filesize supported
+	// 49.9 MB (in bytes)
+	const var MAX_FILESIZE = 49999999
+	if fileInfo.Size() > MAX_FILESIZE {
+		l.Printf("Video filesize is too large to send --> %d", fileInfo.Size())
+		// TODO: Initiate a file cleanup here (Delete the video)
+		return nil, errors.New("Filesize too large to to send to user.")
+	} else {
+		l.Printf("filename found is %s and the filesize is %d bytes", fileInfo.Name(), fileInfo.Size())
+		return file, nil
+	}
 }
 
 func extractYouTubeId(url *regexp2.Match) (string, error) {
