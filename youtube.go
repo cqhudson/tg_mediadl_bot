@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -130,6 +129,8 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 
 func extractYouTubeId(url *regexp2.Match) (string, error) {
 
+	l := logger.NewLogger(true, false, false)
+
 	// url.Group.Capture.String() returns a string.
 	fullUrl := url.Group.Capture.String()
 	domain := ""
@@ -153,7 +154,7 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 			break
 		}
 	}
-	log.Printf("The domain parsed was %s", domain)
+	l.Printf("The domain parsed was %s", domain)
 	if validDomains[domain] == false {
 		// Something really bad happened if you hit this block :(
 		return "", errors.New("(extractYouTubeId func) - no valid YouTube domain could be extracted")
@@ -176,7 +177,7 @@ func extractYouTubeId(url *regexp2.Match) (string, error) {
 
 		temp := ""
 		for i := index + 2; i < len(fullUrl); i++ {
-			log.Printf("temp var == %s", temp)
+			l.Printf("temp var == %s", temp)
 			if temp == "watch" {
 				// this will skip the "?v=" chars
 				offset := 3
