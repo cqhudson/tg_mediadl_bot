@@ -6,3 +6,6 @@ download
 
 # executables folder is where yt-dlp is stored, and potentially others. Not sure if need to track yet.
 exec
+
+# SQLite database
+db/tg_mediadl_bot.db
