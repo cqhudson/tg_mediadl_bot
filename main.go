@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"os"
+	"database/sql"
 
 	"github.com/joho/godotenv"
 	"github.com/mymmrac/telego"
 	"github.com/cqhudson/logger"
+	_ "github.com/glebarez/go-sqlite"
 )
 
 func main() {
@@ -81,6 +83,23 @@ func main() {
 				continue
 			}
 		*/
+		// Connect to SQLite db
+		db, err := sql.Open("sqlite", "./db/tg_mediadl_bot.db")
+		if err != nil {
+			l.Printf("Failed to connect to SQLite database --> %s", err.Error())
+		} else {
+			l.Printf("Connected to SQLite database successfully.")
+		}
+		defer db.Close()
+
+		// Get the version of SQLite
+		var sqliteVersion string
+		err = db.QueryRow("select sqlite_version()").Scan(&sqliteVersion)
+		if err != nil {
+			l.Printf("failed to get sqlite version --> %s", err.Error())
+		} else {
+			l.Printf("SQLite version --> %s", sqliteVersion)
+		}
 
 		l.Printf("Update:  %+v", update)
 

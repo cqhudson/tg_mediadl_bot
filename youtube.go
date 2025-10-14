@@ -121,14 +121,10 @@ func downloadYouTubeVideo(url string, youtubeId string) (*os.File, error) {
 
 	fileInfo, _ := file.Stat()
 
-	// If file is over 49.5MB, we shouldn't send it (Telegram Bot API Limitation)
-	//
-	if fileInfo.Size()
-
 	// Max filesize supported
 	// 49.9 MB (in bytes)
-	const var MAX_FILESIZE = 49999999
-	if fileInfo.Size() > MAX_FILESIZE {
+	const MaxFilesize int64 = 49999999
+	if fileInfo.Size() > MaxFilesize {
 		l.Printf("Video filesize is too large to send --> %d", fileInfo.Size())
 		// TODO: Initiate a file cleanup here (Delete the video)
 		return nil, errors.New("Filesize too large to to send to user.")
